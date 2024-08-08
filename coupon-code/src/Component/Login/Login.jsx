@@ -7,12 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 export const Login = () => {
     const navigate = useNavigate();
-
-    const initialFormData = { 
+    const initialFormData = {
         username: '',
         password: ''
     };
-
     const initialFormErrors = {
         username: '',
         password: ''
@@ -26,7 +24,11 @@ export const Login = () => {
         username: '',
         password: ''
     });
+    const [loginError, setLoginError] = useState('');
 
+    const handleFocus = () => {
+        setLoginError('');
+    }
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -46,33 +48,32 @@ export const Login = () => {
                     username: ''
                 });
             }
-         
+
         }
     };
 
-    const handleSubmit =async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         console.log('Form submitted:', formData);
         axios.post('https://localhost:7298/api/Authenticate', formData)
-        .then((response) => {
-            console.log('Response data:', response.data); 
-            if (response.status === 200) {
-                alert("Login successfully");
-                sessionStorage.setItem('token', response.data.token);
-                sessionStorage.setItem('userId',response.data.userId)
-                navigate('/Home');
-                setFormData(initialFormData);
-                setFormErrors(initialFormErrors);
-            }
-        })
-        .catch((error) => {
-            console.error('Error while login:', error);
-        });
+            .then((response) => {
+                console.log('Response data:', response.data);
+                if (response.status === 200) {
+                    alert("Login successfully");
+                    sessionStorage.setItem('UserData', JSON.stringify(response.data));
+                    navigate('/Home');
+                    setFormData(initialFormData);
+                    setFormErrors(initialFormErrors);
+                }
+            })
+            .catch((error) => {
+                if (error.response.status === 400) {
+                    setLoginError('Invalid username or password');
+                }
+            });
     };
-
     return (
-
-        <div className="container">
+        <div className="login-container">
             <div className="header">
                 <div className="text">Login</div>
                 <div className='underline'></div>
@@ -87,11 +88,11 @@ export const Login = () => {
                             name="username"
                             value={formData.username}
                             onChange={handleChange}
+                            onFocus={handleFocus}
                             required
                         />
                         {formErrors.email && <span className="error">{formErrors.email}</span>}
                     </div>
-
                     <div className="input">
                         <img src={passwordIcon} alt="" />
                         <input
@@ -100,16 +101,16 @@ export const Login = () => {
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
+                            onFocus={handleFocus}
                             required
                         />
-                        {formErrors.password && <span className="error">{formErrors.password}</span>}
                     </div>
-                    <div className="forgot-password">Forgot password? <span>click Here!</span>
+                    <div>
+                        {loginError && <div className="login-error">{loginError}</div>}
                     </div>
                     <div className="submit-container">
-                    <button type="submit" className="submit">Log in</button>
+                        <button type="submit" className="submit">Log in</button>
                     </div>
-
                 </form>
             </div>
         </div>
