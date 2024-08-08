@@ -22,7 +22,7 @@ export const CouponCode = ({userData}) => {
             const reasonParam = selectedReason === "6" ? "other" : selectedReason.value;
             const additionalReasonParam = selectedReason === "6" ? encodeURIComponent(textboxReason) : "";
             console.log(selectedReason);
-            console.log(additionalReasonParam)
+            // console.log(additionalReasonParam)
             const response = await axios.post('https://localhost:7298/api/Authenticate/GetCouponCode', formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
