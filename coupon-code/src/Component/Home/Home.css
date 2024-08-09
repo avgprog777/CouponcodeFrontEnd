@@ -4,6 +4,9 @@
   height: 100vh;
   margin: 0;
   text-align: center;
+  background-image: url("https://img.freepik.com/premium-photo/festive-white-gift-with-golden-bow-purple-coupons-table_499459-844.jpg?w=996");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .feature-access-error{

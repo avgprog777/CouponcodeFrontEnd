@@ -18,13 +18,18 @@ function Navbar({ userData}) {
     const fetchCouponLimit = async () => {
       try {
         const response = await axios.get(`https://localhost:7298/api/Authenticate/GetCouponcodelimitbyUser/${userId}`);
+        setCouponLimit(response.data);
       } catch (err) {
         setError('Failed to fetch coupon limit');
         console.error('Error fetching coupon limit:', err);
       }
     };
-    fetchCouponLimit();
-  }, [])
+  
+    if (userId) {
+      fetchCouponLimit();
+    }
+  }, [userId]); // Added userId to dependency array
+  
 
   return (
     <nav className="navbar">
@@ -33,8 +38,12 @@ function Navbar({ userData}) {
         {userName && (
             <span className="navbar-username">Welcome, {userName.split('@')[0]}</span>
           )}
-           {couponLimit !== null && 
-           (<span className='navbar-couponlimit'>Coupon Limit: {couponLimit}</span>)}
+          {couponLimit != null && (
+    <span className='navbar-couponlimit'>
+        Coupon Limit: {typeof couponLimit === 'number' ? couponLimit : 'Limit exceeded'}
+    </span>
+)}
+
         <ul className="navbar-menu">
         
         {userLevel === 2 || userLevel === 3 ? (

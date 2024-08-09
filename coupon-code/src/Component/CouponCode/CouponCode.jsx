@@ -9,7 +9,8 @@ export const CouponCode = ({userData}) => {
     const [textboxReason, setTextboxReason] = useState("");
     const [couponCodes, setCouponCodes] = useState([]);
     const [error, setError] = useState("");
-    const { userId,token } = userData || {};
+    const {userId, token} = userData || {};
+
     const increment = () => setCount(count + 1);
     const decrement = () => {
         if (count > 0) {
@@ -17,25 +18,27 @@ export const CouponCode = ({userData}) => {
         }
     };
 
-    const handleGenerateCouponCode = async () => {
+    const handleGenerateCouponCode = async (e) => {
+        e.preventDefault();
         try {
-            const reasonParam = selectedReason === "6" ? "other" : selectedReason.value;
-            const additionalReasonParam = selectedReason === "6" ? encodeURIComponent(textboxReason) : "";
-            console.log(selectedReason);
-            console.log(additionalReasonParam)
-            const response = await axios.post('https://localhost:7298/api/Authenticate/GetCouponCode', formData, {
+            let reasonToSend = selectedReason;
+            if (selectedReason === "6") { 
+                reasonToSend = textboxReason;
+            }
+            const formData = {
+                Id: userId,
+                Count: count,
+                Reason: reasonToSend,
+            };
+            const response = await axios.post('https://localhost:7298/api/Authenticate/GenerateCouponCode', formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            if (response.status === 200){
-
+            if (response.status === 200) {
                 setCouponCodes(response.data);
-            }
-           else if (response.status === 400){
-                alert("Hello");
-                setError()
-                console.log(response.data);
+            } else if (response.status === 400) {
+                setError("Bad request. Please check your input.");
             }
             setError("");
         } catch (error) {
@@ -93,15 +96,14 @@ export const CouponCode = ({userData}) => {
             <div className="coupon-header">
                 <h1>Generate Coupon Code</h1>
             </div>
-            <form onSubmit={handleGenerateCouponCode}> 
-                <div className="counter-inner">
-                <span>Please Specify the Coupon quantity</span>
-                <button className="counter-button" onClick={increment}>+</button>
+            <div className="counter-inner">
+                <span>Please Specify the Coupon Quantity:</span>
+                <button type="button" className="counter-button" onClick={increment}>+</button>
                 <span className="counter-value">{count}</span>
-                <button className="counter-button" onClick={decrement}>-</button>
+                <button type="button" className="counter-button" onClick={decrement}>-</button>
             </div>
             <div className="dropdown-container">
-                <label className="lbl-reason">Please select the reason for Coupon Code:</label>
+                <label className="lbl-reason">Please select the reason for the coupon code:</label>
                 <select id="reason-select" value={selectedReason} onChange={handleReasonChange}>
                     <option value="">Select a reason</option>
                     {
@@ -127,8 +129,6 @@ export const CouponCode = ({userData}) => {
                     </div>
                 )}
             </div>
-            </form>
-
             <button
                 className="generate-button"
                 onClick={handleGenerateCouponCode}
@@ -158,6 +158,5 @@ export const CouponCode = ({userData}) => {
                 </div>
             )}
         </div>
-
     );
 };
